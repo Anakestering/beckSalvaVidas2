@@ -1,4 +1,3 @@
-
 package com.example.demo.service;
 
 import java.time.LocalDate;
@@ -13,6 +12,7 @@ import com.example.demo.dto.CheckoutResponseDTO;
 import com.example.demo.entity.Arquivo;
 import com.example.demo.entity.Checkout;
 import com.example.demo.entity.Posto;
+import com.example.demo.repository.CheckinRepository;
 import com.example.demo.repository.CheckoutRepository;
 import com.example.demo.repository.PostoRepository;
 
@@ -30,23 +30,40 @@ public class CheckoutService {
     @Autowired
     private CheckoutRepository checkoutRepository;
 
+    @Autowired
+    private CheckinRepository checkinRepository;
+
+    @Autowired
+    private RelatorioService relatorioService;
+
     @Transactional
     public CheckoutResponseDTO checkout(CheckoutDTO dto) {
 
         Posto posto = postoRepository.findById(dto.getPostoId()).orElseThrow();
 
-        // Valida limite de 3 checkins por dia
         LocalDate hoje = LocalDate.now();
         LocalDateTime inicio = hoje.atStartOfDay();
         LocalDateTime fim = hoje.atTime(23, 59, 59);
 
-        
+        // 1. Valida se existe checkin hoje nesse posto
+        boolean temCheckin = checkinRepository
+                .existsByPostoIdAndDataHoraBetween(posto.getId(), inicio, fim);
 
+        if (!temCheckin) {
+            throw new RuntimeException("É necessário realizar o checkin antes do checkout.");
+        }
+
+        // 2. Valida se existe relatório hoje nesse posto
+        if (!relatorioService.existeHoje(posto.getId())) {
+            throw new RuntimeException("É necessário enviar o relatório antes do checkout.");
+        }
+
+        // 3. Valida limite de 3 checkouts por dia
         List<Checkout> checkoutsHoje = checkoutRepository
                 .findByPostoIdAndDataHoraBetween(posto.getId(), inicio, fim);
 
         if (checkoutsHoje.size() >= 3) {
-            throw new RuntimeException("Limite de 3 registros por dia atingido");
+            throw new RuntimeException("Limite de 3 registros por dia atingido.");
         }
 
         Checkout checkout = new Checkout();
@@ -58,13 +75,13 @@ public class CheckoutService {
             checkout.setFoto(arquivo);
         }
 
-        Checkout checkoutSalvo = checkoutRepository.save(checkout);
+        Checkout salvo = checkoutRepository.save(checkout);
 
-        CheckoutResponseDTO crd = new CheckoutResponseDTO();
-        crd.setPosto(posto.getNome());
-        crd.setHorario(checkoutSalvo.getCreatedAt());
+        CheckoutResponseDTO response = new CheckoutResponseDTO();
+        response.setPosto(posto.getNome());
+        response.setHorario(salvo.getCreatedAt());
 
-        return crd;
+        return response;
     }
 
     public List<CheckoutDTO> listarTodos() {
@@ -104,7 +121,6 @@ public class CheckoutService {
                 .toList();
     }
 
-    // Converte dto
     private CheckoutDTO toDto(Checkout checkout) {
         CheckoutDTO dto = new CheckoutDTO();
         dto.setPostoId(checkout.getPosto().getId());
