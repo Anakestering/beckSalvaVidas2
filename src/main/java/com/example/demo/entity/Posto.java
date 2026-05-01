@@ -1,6 +1,5 @@
 package com.example.demo.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -9,7 +8,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,11 +15,14 @@ import lombok.NoArgsConstructor;
 @Table(name = "posto")
 @EqualsAndHashCode(callSuper = false)
 public class Posto extends BaseEntity {
-    
-@Column(name = "nome", nullable = false)
+
+    @Column(name = "nome", nullable = false)
     private String nome;
 
     @Column(name = "descricao", nullable = true)
     private String descricao;
+
+    @Column(name = "ordem", nullable = false)
+    private Integer ordem = 0;
 
 }

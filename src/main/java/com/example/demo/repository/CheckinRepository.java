@@ -24,7 +24,7 @@ public interface CheckinRepository extends JpaRepository<Checkin, Long> {
             LocalDateTime fim);
 
     @Query("""
-                SELECT c FROM Checkins c
+                SELECT c FROM Checkin c
                 JOIN c.posto p
                 WHERE c.visivelAdmin = true
                 ORDER BY
