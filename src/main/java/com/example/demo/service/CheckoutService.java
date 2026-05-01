@@ -8,18 +8,18 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dto.CheckinDTO;
-import com.example.demo.dto.CheckinResponseDTO;
+import com.example.demo.dto.CheckoutDTO;
+import com.example.demo.dto.CheckoutResponseDTO;
 import com.example.demo.entity.Arquivo;
-import com.example.demo.entity.Checkin;
+import com.example.demo.entity.Checkout;
 import com.example.demo.entity.Posto;
-import com.example.demo.repository.CheckinRepository;
+import com.example.demo.repository.CheckoutRepository;
 import com.example.demo.repository.PostoRepository;
 
 import jakarta.transaction.Transactional;
 
 @Service
-public class CheckService {
+public class CheckoutService {
 
     @Autowired
     private PostoRepository postoRepository;
@@ -28,10 +28,10 @@ public class CheckService {
     private ArquivoService arquivoService;
 
     @Autowired
-    private CheckinRepository checkinRepository;
+    private CheckoutRepository checkoutRepository;
 
     @Transactional
-    public CheckinResponseDTO checkin(CheckinDTO dto) {
+    public CheckoutResponseDTO checkout(CheckoutDTO dto) {
 
         Posto posto = postoRepository.findById(dto.getPostoId()).orElseThrow();
 
@@ -40,33 +40,35 @@ public class CheckService {
         LocalDateTime inicio = hoje.atStartOfDay();
         LocalDateTime fim = hoje.atTime(23, 59, 59);
 
-        List<Checkin> checkinsHoje = checkinRepository
+        
+
+        List<Checkout> checkoutsHoje = checkoutRepository
                 .findByPostoIdAndDataHoraBetween(posto.getId(), inicio, fim);
 
-        if (checkinsHoje.size() >= 3) {
+        if (checkoutsHoje.size() >= 3) {
             throw new RuntimeException("Limite de 3 registros por dia atingido");
         }
 
-        Checkin checkin = new Checkin();
-        checkin.setPosto(posto);
-        checkin.setDataHora(LocalDateTime.now());
+        Checkout checkout = new Checkout();
+        checkout.setPosto(posto);
+        checkout.setDataHora(LocalDateTime.now());
 
         if (dto.getFoto() != null && !dto.getFoto().isEmpty()) {
             Arquivo arquivo = arquivoService.upload(dto.getFoto());
-            checkin.setFoto(arquivo);
+            checkout.setFoto(arquivo);
         }
 
-        Checkin checkinSalvo = checkinRepository.save(checkin);
+        Checkout checkoutSalvo = checkoutRepository.save(checkout);
 
-        CheckinResponseDTO crd = new CheckinResponseDTO();
+        CheckoutResponseDTO crd = new CheckoutResponseDTO();
         crd.setPosto(posto.getNome());
-        crd.setHorario(checkinSalvo.getCreatedAt());
+        crd.setHorario(checkoutSalvo.getCreatedAt());
 
         return crd;
     }
 
-    public List<CheckinDTO> listarTodos() {
-        return checkinRepository.buscarOrdenadosPorPosto()
+    public List<CheckoutDTO> listarTodos() {
+        return checkoutRepository.buscarOrdenadosPorPosto()
                 .stream()
                 .map(this::toDto)
                 .toList();
@@ -74,28 +76,28 @@ public class CheckService {
 
     @Transactional
     public void ocultarTodos() {
-        List<Checkin> lista = checkinRepository.findAll();
+        List<Checkout> lista = checkoutRepository.findAll();
 
-        for (Checkin c : lista) {
+        for (Checkout c : lista) {
             c.setVisivelAdmin(false);
         }
 
-        checkinRepository.saveAll(lista);
+        checkoutRepository.saveAll(lista);
     }
 
     @Transactional
     public void ocultar(Long id) {
-        Checkin c = checkinRepository.findById(id).orElseThrow();
+        Checkout c = checkoutRepository.findById(id).orElseThrow();
         c.setVisivelAdmin(false);
-        checkinRepository.save(c);
+        checkoutRepository.save(c);
     }
 
-    public List<CheckinDTO> buscarHoje(Long postoId) {
+    public List<CheckoutDTO> buscarHoje(Long postoId) {
         LocalDate hoje = LocalDate.now();
         LocalDateTime inicio = hoje.atStartOfDay();
         LocalDateTime fim = hoje.atTime(23, 59, 59);
 
-        return checkinRepository
+        return checkoutRepository
                 .findByPostoIdAndDataHoraBetween(postoId, inicio, fim)
                 .stream()
                 .map(this::toDto)
@@ -103,10 +105,10 @@ public class CheckService {
     }
 
     // Converte dto
-    private CheckinDTO toDto(Checkin checkin) {
-        CheckinDTO dto = new CheckinDTO();
-        dto.setPostoId(checkin.getPosto().getId());
-        dto.setDataHora(checkin.getDataHora());
+    private CheckoutDTO toDto(Checkout checkout) {
+        CheckoutDTO dto = new CheckoutDTO();
+        dto.setPostoId(checkout.getPosto().getId());
+        dto.setDataHora(checkout.getDataHora());
         return dto;
     }
 }

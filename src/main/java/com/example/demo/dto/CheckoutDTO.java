@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class CheckinDTO {
+public class CheckoutDTO {
 
     @NotNull(message = "O ID do posto é obrigatório.")
     private Long postoId;

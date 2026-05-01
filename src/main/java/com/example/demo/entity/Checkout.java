@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "checkins")
+@Table(name = "checkouts")
 @EqualsAndHashCode(callSuper = false)
-public class Checkin extends BaseEntity{
+public class Checkout extends BaseEntity{
 
     @ManyToOne
     private Posto posto;
