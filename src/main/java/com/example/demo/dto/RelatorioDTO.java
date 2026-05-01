@@ -1,5 +1,8 @@
-// dto/RelatorioDTO.java
+
 package com.example.demo.dto;
+
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -7,6 +10,9 @@ import lombok.Data;
 @Data
 public class RelatorioDTO {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Long id; 
+    
     @NotNull(message = "O ID do posto é obrigatório.")
     private Long postoId;
 

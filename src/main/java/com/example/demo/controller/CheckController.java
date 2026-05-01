@@ -1,4 +1,4 @@
-// CheckController.java — rotas separadas para checkin e checkout
+
 package com.example.demo.controller;
 
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.demo.annotations.Admin;
 import com.example.demo.dto.CheckinDTO;
 import com.example.demo.dto.CheckinResponseDTO;
 import com.example.demo.dto.CheckoutDTO;
@@ -27,55 +28,60 @@ public class CheckController {
 
     // ─── Checkin ────────────────────────────────────────────
 
-    @PostMapping("/in")
+    @PostMapping(value = "/in", consumes = "multipart/form-data")
     public CheckinResponseDTO checkin(@ModelAttribute @Valid CheckinDTO dto) {
         return checkService.checkin(dto);
     }
 
     @GetMapping("/in")
-    public List<CheckinDTO> listarCheckins() {
+    public List<CheckinResponseDTO> listarCheckins() {
         return checkService.listarTodos();
     }
 
+    @Admin
     @PatchMapping("/in/ocultar-todos")
     public void ocultarTodosCheckins() {
         checkService.ocultarTodos();
     }
 
+    @Admin
     @PatchMapping("/in/ocultar/{id}")
     public void ocultarCheckin(@PathVariable Long id) {
         checkService.ocultar(id);
     }
 
     @GetMapping("/in/hoje/{postoId}")
-    public List<CheckinDTO> buscarCheckinsHoje(@PathVariable Long postoId) {
+    public List<CheckinResponseDTO> buscarCheckinsHoje(@PathVariable Long postoId) {
         return checkService.buscarHoje(postoId);
     }
 
     // ─── Checkout ───────────────────────────────────────────
 
-    @PostMapping("/out")
+    @PostMapping(value = "/out", consumes = "multipart/form-data")
     public CheckoutResponseDTO checkout(@ModelAttribute @Valid CheckoutDTO dto) {
         return checkoutService.checkout(dto);
     }
 
     @GetMapping("/out")
-    public List<CheckoutDTO> listarCheckouts() {
+    public List<CheckoutResponseDTO> listarCheckouts() {
         return checkoutService.listarTodos();
     }
 
+
+    @Admin
     @PatchMapping("/out/ocultar-todos")
     public void ocultarTodosCheckouts() {
         checkoutService.ocultarTodos();
     }
 
+    @Admin
     @PatchMapping("/out/ocultar/{id}")
     public void ocultarCheckout(@PathVariable Long id) {
         checkoutService.ocultar(id);
     }
 
     @GetMapping("/out/hoje/{postoId}")
-    public List<CheckoutDTO> buscarCheckoutsHoje(@PathVariable Long postoId) {
+    public List<CheckoutResponseDTO> buscarCheckoutsHoje(@PathVariable Long postoId) {
         return checkoutService.buscarHoje(postoId);
     }
 }

@@ -10,16 +10,22 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import com.example.demo.entity.Arquivo;
 import com.example.demo.repository.ArquivoRepository;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+
 @Service
 public class ArquivoService {
 
-    @Value("{$arquivamento.path}")
+    @Value("${arquivamento.path}")
     private String path;
 
     @Autowired
@@ -52,5 +58,28 @@ public class ArquivoService {
             throw new RuntimeException("Erro ao salvar arquivo", e);
         }
     }
+
+    public ResponseEntity<Resource> servir(String nome) {
+    try {
+        Path arquivo = Paths.get(path).resolve(nome);
+        Resource resource = new UrlResource(arquivo.toUri());
+
+        if (!resource.exists() || !resource.isReadable()) {
+            throw new RuntimeException("Arquivo não encontrado: " + nome);
+        }
+
+        String contentType = Files.probeContentType(arquivo);
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(resource);
+
+    } catch (IOException e) {
+        throw new RuntimeException("Erro ao ler arquivo", e);
+    }
+}
 
 }

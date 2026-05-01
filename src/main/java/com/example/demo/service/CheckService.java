@@ -4,6 +4,7 @@ package com.example.demo.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,16 +62,20 @@ public class CheckService {
         CheckinResponseDTO crd = new CheckinResponseDTO();
         crd.setPosto(posto.getNome());
         crd.setHorario(checkinSalvo.getCreatedAt());
+        if (checkinSalvo.getFoto() != null) {
+            String nomeArquivo = Paths.get(checkinSalvo.getFoto().getCaminho()).getFileName().toString();
+            crd.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
+        }
 
         return crd;
     }
 
-    public List<CheckinDTO> listarTodos() {
-        return checkinRepository.buscarOrdenadosPorPosto()
-                .stream()
-                .map(this::toDto)
-                .toList();
-    }
+    public List<CheckinResponseDTO> listarTodos() {
+    return checkinRepository.buscarOrdenadosPorPosto()
+            .stream()
+            .map(this::toResponseDto)
+            .toList();
+}
 
     @Transactional
     public void ocultarTodos() {
@@ -90,7 +95,7 @@ public class CheckService {
         checkinRepository.save(c);
     }
 
-    public List<CheckinDTO> buscarHoje(Long postoId) {
+    public List<CheckinResponseDTO> buscarHoje(Long postoId) {
         LocalDate hoje = LocalDate.now();
         LocalDateTime inicio = hoje.atStartOfDay();
         LocalDateTime fim = hoje.atTime(23, 59, 59);
@@ -98,15 +103,27 @@ public class CheckService {
         return checkinRepository
                 .findByPostoIdAndDataHoraBetween(postoId, inicio, fim)
                 .stream()
-                .map(this::toDto)
+                .map(this::toResponseDto)
                 .toList();
     }
 
+   
+
+
+
     // Converte dto
-    private CheckinDTO toDto(Checkin checkin) {
-        CheckinDTO dto = new CheckinDTO();
-        dto.setPostoId(checkin.getPosto().getId());
-        dto.setDataHora(checkin.getDataHora());
+    private CheckinResponseDTO toResponseDto(Checkin checkin) {
+        CheckinResponseDTO dto = new CheckinResponseDTO();
+        dto.setPosto(checkin.getPosto().getNome());
+        dto.setHorario(checkin.getDataHora());
+
+        if (checkin.getFoto() != null) {
+        String nomeArquivo = Paths.get(checkin.getFoto().getCaminho()).getFileName().toString();
+        dto.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
+    }
+
         return dto;
     }
+
+
 }

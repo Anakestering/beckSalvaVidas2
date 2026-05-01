@@ -16,4 +16,6 @@ public interface UsuarioRepository extends BaseRepository<Usuario, Long> {
     """)
     Optional<Usuario> findByEmail(String email);
 
+    boolean existsByEmail(String email);
+
 }

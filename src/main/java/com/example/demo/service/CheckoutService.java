@@ -3,6 +3,7 @@ package com.example.demo.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,15 +80,19 @@ public class CheckoutService {
 
         CheckoutResponseDTO response = new CheckoutResponseDTO();
         response.setPosto(posto.getNome());
-        response.setHorario(salvo.getCreatedAt());
+        response.setHorario(salvo.getDataHora());
 
+       if (salvo.getFoto() != null) {
+    String nomeArquivo = Paths.get(salvo.getFoto().getCaminho()).getFileName().toString();
+    response.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
+}
         return response;
     }
 
-    public List<CheckoutDTO> listarTodos() {
+    public List<CheckoutResponseDTO> listarTodos() {
         return checkoutRepository.buscarOrdenadosPorPosto()
                 .stream()
-                .map(this::toDto)
+                .map(this::toResponseDto)
                 .toList();
     }
 
@@ -109,7 +114,7 @@ public class CheckoutService {
         checkoutRepository.save(c);
     }
 
-    public List<CheckoutDTO> buscarHoje(Long postoId) {
+    public List<CheckoutResponseDTO> buscarHoje(Long postoId) {
         LocalDate hoje = LocalDate.now();
         LocalDateTime inicio = hoje.atStartOfDay();
         LocalDateTime fim = hoje.atTime(23, 59, 59);
@@ -117,14 +122,21 @@ public class CheckoutService {
         return checkoutRepository
                 .findByPostoIdAndDataHoraBetween(postoId, inicio, fim)
                 .stream()
-                .map(this::toDto)
+                .map(this::toResponseDto)
                 .toList();
     }
 
-    private CheckoutDTO toDto(Checkout checkout) {
-        CheckoutDTO dto = new CheckoutDTO();
-        dto.setPostoId(checkout.getPosto().getId());
-        dto.setDataHora(checkout.getDataHora());
+    private CheckoutResponseDTO toResponseDto(Checkout checkout) {
+        CheckoutResponseDTO dto = new CheckoutResponseDTO();
+
+        dto.setPosto(checkout.getPosto().getNome());
+        dto.setHorario(checkout.getDataHora());
+
+        if (checkout.getFoto() != null) {
+        String nomeArquivo = Paths.get(checkout.getFoto().getCaminho()).getFileName().toString();
+        dto.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
+    }
+
         return dto;
     }
 }

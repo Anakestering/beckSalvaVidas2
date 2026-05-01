@@ -10,10 +10,10 @@ import com.example.demo.entity.Checkout;
 @Repository
 public interface CheckoutRepository extends BaseRepository<Checkout, Long> {
 
-     // Buscar todos registros de um posto
+        // Buscar todos registros de um posto
         List<Checkout> findByPostoId(Long postoId);
 
-        // Buscar por período 
+        // Buscar por período
         List<Checkout> findByDataHoraBetween(LocalDateTime inicio, LocalDateTime fim);
 
         List<Checkout> findByPostoIdAndDataHoraBetween(
@@ -25,10 +25,7 @@ public interface CheckoutRepository extends BaseRepository<Checkout, Long> {
                             SELECT c FROM Checkout c
                             JOIN c.posto p
                             WHERE c.visivelAdmin = true
-                            ORDER BY
-                                CASE WHEN p.ordem IS NULL THEN 1 ELSE 0 END,
-                                p.ordem ASC,
-                                c.dataHora ASC
+                            ORDER BY p.id ASC, c.dataHora ASC
                         """)
         List<Checkout> buscarOrdenadosPorPosto();
 

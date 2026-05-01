@@ -1,4 +1,4 @@
-// entity/Relatorio.java
+
 package com.example.demo.entity;
 
 import java.time.LocalDate;
@@ -14,7 +14,7 @@ import lombok.*;
 public class Relatorio extends BaseEntity {
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "posto_id", nullable = false) 
     private Posto posto;
 
     @Column(nullable = false)
@@ -36,4 +36,7 @@ public class Relatorio extends BaseEntity {
 
     @Column(length = 1000)
     private String observacoes;
+
+    @Column(nullable = false)
+    private boolean visivelAdmin = true;
 }

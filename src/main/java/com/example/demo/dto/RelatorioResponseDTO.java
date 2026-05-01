@@ -1,4 +1,4 @@
-// dto/RelatorioResponseDTO.java
+
 package com.example.demo.dto;
 
 import java.time.LocalDate;
@@ -6,7 +6,8 @@ import lombok.Data;
 
 @Data
 public class RelatorioResponseDTO {
-    private String posto;
+    private Long postoId;
+     private String posto; 
     private LocalDate data;
     private int ataquesManha;
     private int prevencoesManha;

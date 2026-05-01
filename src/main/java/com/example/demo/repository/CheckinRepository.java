@@ -27,12 +27,10 @@ public interface CheckinRepository extends JpaRepository<Checkin, Long> {
                 SELECT c FROM Checkin c
                 JOIN c.posto p
                 WHERE c.visivelAdmin = true
-                ORDER BY
-                    CASE WHEN p.ordem IS NULL THEN 1 ELSE 0 END,
-                    p.ordem ASC,
-                    c.dataHora ASC
+                ORDER BY p.id ASC, c.dataHora ASC
             """)
     List<Checkin> buscarOrdenadosPorPosto();
+
 
     boolean existsByPostoIdAndDataHoraBetween(Long postoId, LocalDateTime inicio, LocalDateTime fim);
 
