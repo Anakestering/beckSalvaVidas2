@@ -1,11 +1,21 @@
 
 package com.example.demo.service;
 
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import java.io.ByteArrayOutputStream;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.demo.dto.RelatorioDTO;
@@ -29,7 +39,8 @@ public class RelatorioService {
     @Transactional
     public RelatorioResponseDTO salvar(RelatorioDTO dto) {
 
-        Posto posto = postoRepository.findById(dto.getPostoId()).orElseThrow();
+        Posto posto = postoRepository.findById(dto.getPostoId())
+                .orElseThrow(() -> new RuntimeException("Posto não encontrado com id: " + dto.getPostoId()));
 
         LocalDate hoje = LocalDate.now();
 
@@ -58,6 +69,7 @@ public class RelatorioService {
 
     private RelatorioResponseDTO toResponse(Relatorio r) {
         RelatorioResponseDTO dto = new RelatorioResponseDTO();
+        dto.setId(r.getId());
         dto.setPostoId(r.getPosto().getId());
         dto.setPosto(r.getPosto().getNome());
         dto.setData(r.getData());
@@ -111,6 +123,7 @@ public class RelatorioService {
     // Converte dto
     private RelatorioResponseDTO toDto(Relatorio relatorio) {
         RelatorioResponseDTO dto = new RelatorioResponseDTO();
+        dto.setId(relatorio.getId());
         dto.setPostoId(relatorio.getPosto().getId());
         dto.setPosto(relatorio.getPosto().getNome());
         dto.setData(relatorio.getData());
@@ -121,4 +134,63 @@ public class RelatorioService {
         dto.setObservacoes(relatorio.getObservacoes());
         return dto;
     }
+
+    // ==============exportacao===============
+
+    public ResponseEntity<byte[]> exportarExcel(LocalDate inicio, LocalDate fim) {
+        List<Relatorio> relatorios = relatorioRepository
+                .findByDataBetweenOrderByDataAscPostoNomeAsc(inicio, fim);
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Relatórios");
+
+            // Cabeçalho
+            Row header = sheet.createRow(0);
+            String[] colunas = { "Data", "Posto", "Prev. Manhã", "Lesões Manhã", "Prev. Tarde", "Lesões Tarde",
+                    "Total Prev.", "Total Lesões", "Observações" };
+            for (int i = 0; i < colunas.length; i++) {
+                Cell cell = header.createCell(i);
+                cell.setCellValue(colunas[i]);
+                CellStyle style = workbook.createCellStyle();
+                Font font = workbook.createFont();
+                font.setBold(true);
+                style.setFont(font);
+                cell.setCellStyle(style);
+            }
+
+            // Dados
+            int rowNum = 1;
+            for (Relatorio r : relatorios) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(r.getData().toString());
+                row.createCell(1).setCellValue(r.getPosto().getNome());
+                row.createCell(2).setCellValue(r.getPrevencoesManha());
+                row.createCell(3).setCellValue(r.getAtaquesManha());
+                row.createCell(4).setCellValue(r.getPrevencoesTarde());
+                row.createCell(5).setCellValue(r.getAtaquesTarde());
+                row.createCell(6).setCellValue(r.getPrevencoesManha() + r.getPrevencoesTarde());
+                row.createCell(7).setCellValue(r.getAtaquesManha() + r.getAtaquesTarde());
+                row.createCell(8).setCellValue(r.getObservacoes() != null ? r.getObservacoes() : "");
+            }
+
+            // Auto-size colunas
+            for (int i = 0; i < colunas.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(
+                    MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.setContentDispositionFormData("attachment", "relatorios_" + inicio + "_" + fim + ".xlsx");
+
+            return ResponseEntity.ok().headers(headers).body(out.toByteArray());
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar Excel", e);
+        }
+    }
+
 }

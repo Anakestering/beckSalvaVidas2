@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class RelatorioResponseDTO {
+    private Long id; 
     private Long postoId;
      private String posto; 
     private LocalDate data;

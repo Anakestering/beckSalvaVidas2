@@ -61,6 +61,7 @@ public class CheckService {
 
         CheckinResponseDTO crd = new CheckinResponseDTO();
         crd.setPosto(posto.getNome());
+        crd.setId(checkinSalvo.getId());
         crd.setHorario(checkinSalvo.getCreatedAt());
         if (checkinSalvo.getFoto() != null) {
             String nomeArquivo = Paths.get(checkinSalvo.getFoto().getCaminho()).getFileName().toString();
@@ -114,6 +115,7 @@ public class CheckService {
     // Converte dto
     private CheckinResponseDTO toResponseDto(Checkin checkin) {
         CheckinResponseDTO dto = new CheckinResponseDTO();
+        dto.setId(checkin.getId());
         dto.setPosto(checkin.getPosto().getNome());
         dto.setHorario(checkin.getDataHora());
 

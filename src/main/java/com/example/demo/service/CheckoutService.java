@@ -80,6 +80,7 @@ public class CheckoutService {
 
         CheckoutResponseDTO response = new CheckoutResponseDTO();
         response.setPosto(posto.getNome());
+        response.setId(salvo.getId()); 
         response.setHorario(salvo.getDataHora());
 
        if (salvo.getFoto() != null) {
@@ -129,6 +130,7 @@ public class CheckoutService {
     private CheckoutResponseDTO toResponseDto(Checkout checkout) {
         CheckoutResponseDTO dto = new CheckoutResponseDTO();
 
+        dto.setId(checkout.getId()); 
         dto.setPosto(checkout.getPosto().getNome());
         dto.setHorario(checkout.getDataHora());
 

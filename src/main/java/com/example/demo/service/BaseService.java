@@ -7,6 +7,7 @@ import org.springframework.beans.BeanUtils;
 import com.example.demo.entity.BaseEntity;
 import com.example.demo.repository.BaseRepository;
 import jakarta.transaction.Transactional;
+import com.example.demo.service.BaseService;
 
 public abstract class BaseService<E extends BaseEntity, D> {
 

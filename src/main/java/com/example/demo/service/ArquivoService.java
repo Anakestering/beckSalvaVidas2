@@ -7,14 +7,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 
 import com.example.demo.entity.Arquivo;
 import com.example.demo.repository.ArquivoRepository;
@@ -40,6 +38,12 @@ public class ArquivoService {
                 Files.createDirectories(root);
             }
 
+            String nomeOriginal = file.getOriginalFilename();
+            String extensao = "";
+            if (nomeOriginal != null && nomeOriginal.contains(".")) {
+                extensao = nomeOriginal.substring(nomeOriginal.lastIndexOf("."));
+            }
+
             String nome = UUID.randomUUID().toString();
 
             Path destino = root.resolve(nome);
@@ -60,26 +64,26 @@ public class ArquivoService {
     }
 
     public ResponseEntity<Resource> servir(String nome) {
-    try {
-        Path arquivo = Paths.get(path).resolve(nome);
-        Resource resource = new UrlResource(arquivo.toUri());
+        try {
+            Path arquivo = Paths.get(path).resolve(nome);
+            Resource resource = new UrlResource(arquivo.toUri());
 
-        if (!resource.exists() || !resource.isReadable()) {
-            throw new RuntimeException("Arquivo não encontrado: " + nome);
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new RuntimeException("Arquivo não encontrado: " + nome);
+            }
+
+            String contentType = Files.probeContentType(arquivo);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(resource);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao ler arquivo", e);
         }
-
-        String contentType = Files.probeContentType(arquivo);
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(resource);
-
-    } catch (IOException e) {
-        throw new RuntimeException("Erro ao ler arquivo", e);
     }
-}
 
 }

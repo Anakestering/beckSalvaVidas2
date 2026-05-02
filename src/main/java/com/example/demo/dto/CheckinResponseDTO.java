@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 public class CheckinResponseDTO {
-    
+    private Long id; 
     private String posto;
 
     private String foto;

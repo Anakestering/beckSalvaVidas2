@@ -17,9 +17,9 @@ public class PostoDTO {
 
     @NotBlank(message = "O nome deve ser preenchido.")
     private String nome;
-
   
     private String descricao;
 
-
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private boolean ativo;
 }

@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 public class CheckoutResponseDTO {
-    
+    private Long id; 
     private String posto;
 
     private String foto;

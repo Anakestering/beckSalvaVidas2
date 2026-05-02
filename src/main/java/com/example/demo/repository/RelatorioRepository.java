@@ -30,4 +30,6 @@ public interface RelatorioRepository extends BaseRepository<Relatorio, Long> {
             """)
     List<Relatorio> findAllByOrderByPosto_IdAsc();
 
+    List<Relatorio> findByDataBetweenOrderByDataAscPostoNomeAsc(LocalDate inicio, LocalDate fim);
+
 }
