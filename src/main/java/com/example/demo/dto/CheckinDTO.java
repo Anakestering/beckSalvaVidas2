@@ -14,6 +14,4 @@ public class CheckinDTO {
 
     private MultipartFile foto;
     
-    
-    
 }

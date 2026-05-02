@@ -8,7 +8,7 @@ import lombok.Data;
 public class RelatorioResponseDTO {
     private Long id; 
     private Long postoId;
-     private String posto; 
+    private String posto; 
     private LocalDate data;
     private int ataquesManha;
     private int prevencoesManha;

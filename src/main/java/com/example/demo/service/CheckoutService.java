@@ -46,7 +46,6 @@ public class CheckoutService {
         LocalDateTime inicio = hoje.atStartOfDay();
         LocalDateTime fim = hoje.atTime(23, 59, 59);
 
-        // 1. Valida se existe checkin hoje nesse posto
         boolean temCheckin = checkinRepository
                 .existsByPostoIdAndDataHoraBetween(posto.getId(), inicio, fim);
 
@@ -54,12 +53,10 @@ public class CheckoutService {
             throw new RuntimeException("É necessário realizar o checkin antes do checkout.");
         }
 
-        // 2. Valida se existe relatório hoje nesse posto
         if (!relatorioService.existeHoje(posto.getId())) {
             throw new RuntimeException("É necessário enviar o relatório antes do checkout.");
         }
 
-        // 3. Valida limite de 3 checkouts por dia
         List<Checkout> checkoutsHoje = checkoutRepository
                 .findByPostoIdAndDataHoraBetween(posto.getId(), inicio, fim);
 

@@ -36,7 +36,6 @@ public class CheckService {
 
         Posto posto = postoRepository.findById(dto.getPostoId()).orElseThrow();
 
-        // Valida limite de 3 checkins por dia
         LocalDate hoje = LocalDate.now();
         LocalDateTime inicio = hoje.atStartOfDay();
         LocalDateTime fim = hoje.atTime(23, 59, 59);
@@ -109,10 +108,6 @@ public class CheckService {
     }
 
    
-
-
-
-    // Converte dto
     private CheckinResponseDTO toResponseDto(Checkin checkin) {
         CheckinResponseDTO dto = new CheckinResponseDTO();
         dto.setId(checkin.getId());

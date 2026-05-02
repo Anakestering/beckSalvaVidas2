@@ -10,10 +10,8 @@ import com.example.demo.entity.Checkout;
 @Repository
 public interface CheckoutRepository extends BaseRepository<Checkout, Long> {
 
-        // Buscar todos registros de um posto
         List<Checkout> findByPostoId(Long postoId);
 
-        // Buscar por período
         List<Checkout> findByDataHoraBetween(LocalDateTime inicio, LocalDateTime fim);
 
         List<Checkout> findByPostoIdAndDataHoraBetween(

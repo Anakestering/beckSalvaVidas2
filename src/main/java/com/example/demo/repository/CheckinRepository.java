@@ -12,10 +12,8 @@ import com.example.demo.entity.Checkin;
 @Repository
 public interface CheckinRepository extends JpaRepository<Checkin, Long> {
 
-    // Buscar todos registros de um posto
     List<Checkin> findByPosto(Long postoId);
 
-    // Buscar por período (muito importante)
     List<Checkin> findByDataHoraBetween(LocalDateTime inicio, LocalDateTime fim);
 
     List<Checkin> findByPostoIdAndDataHoraBetween(
@@ -30,7 +28,6 @@ public interface CheckinRepository extends JpaRepository<Checkin, Long> {
                 ORDER BY p.id ASC, c.dataHora ASC
             """)
     List<Checkin> buscarOrdenadosPorPosto();
-
 
     boolean existsByPostoIdAndDataHoraBetween(Long postoId, LocalDateTime inicio, LocalDateTime fim);
 

@@ -20,14 +20,12 @@ public class Relatorio extends BaseEntity {
     @Column(nullable = false)
     private LocalDate data;
 
-    // Manhã
     @Column(nullable = false)
     private int ataquesManha = 0;
 
     @Column(nullable = false)
     private int prevencoesManha = 0;
 
-    // Tarde
     @Column(nullable = false)
     private int ataquesTarde = 0;
 

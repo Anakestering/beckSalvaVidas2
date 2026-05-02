@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 public class CheckoutDTO {
 
-
     @NotNull(message = "O ID do posto é obrigatório.")
     private Long postoId;
 

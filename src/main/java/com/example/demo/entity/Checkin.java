@@ -31,6 +31,4 @@ public class Checkin extends BaseEntity{
     @Column
     private LocalDateTime dataHora;
 
-    
-    
 }

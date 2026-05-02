@@ -27,7 +27,6 @@ public class UsuarioService extends BaseService<Usuario, UsuarioDTO> {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado.");
         }
 
-        // Criptografa a senha antes de salvar
         Usuario usuario = toEntity(dto);
         usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
 
