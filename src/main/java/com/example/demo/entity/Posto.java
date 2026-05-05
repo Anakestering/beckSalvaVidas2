@@ -22,7 +22,8 @@ public class Posto extends BaseEntity {
     @Column(name = "descricao", nullable = true)
     private String descricao;
 
-    @Column(name = "ordem", nullable = false)
+    @Column(name = "ordem", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
     private Integer ordem = 0;
+
 
 }

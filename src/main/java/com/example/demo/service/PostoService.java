@@ -18,6 +18,17 @@ public class PostoService extends BaseService<Posto, PostoDTO> {
         this.postoRepository = repository;
     }
 
+    @Override
+public PostoDTO create(PostoDTO dto) {
+    Posto posto = toEntity(dto);
+    System.out.println("ATIVO ANTES: " + posto.isAtivo());
+    posto.setAtivo(true);
+    System.out.println("ATIVO DEPOIS: " + posto.isAtivo());
+    Posto salvo = postoRepository.save(posto);
+    System.out.println("ATIVO SALVO: " + salvo.isAtivo());
+    return toDto(salvo);
+}
+
     public List<PostoDTO> listarOrdenados() {
         return postoRepository.findByDeletedAtIsNullOrderByAtivoDescNomeAsc()
                 .stream()

@@ -63,13 +63,14 @@ public abstract class BaseService<E extends BaseEntity, D> {
         try {
             E e = entityClass.getDeclaredConstructor().newInstance();
 
-            BeanUtils.copyProperties(dto, e);
+            BeanUtils.copyProperties(dto, e, "ativo", "id", "createdAt", "updatedAt", "deletedAt");
 
             return e;
         } catch (Exception ex) {
-            throw new RuntimeException("Erro ao converter de DTO para Entity");
+            throw new RuntimeException("Erro ao converter de DTO para Entity", ex);
         }
     }
+
 
     public D toDto(E entity) {
         try {

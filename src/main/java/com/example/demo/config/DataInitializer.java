@@ -34,6 +34,20 @@ public class DataInitializer {
             }else{
                 System.out.println("Usuário ADMIN já existe no banco!");
             }
+
+            if(repository.count() <= 0){
+                Usuario usuario = new Usuario();
+
+                usuario.setEmail("user@user.com");
+                usuario.setNivelAcesso(NivelAcesso.PADRAO);
+                usuario.setSenha(passwordEncoder.encode("123456789"));
+
+                repository.save(usuario);
+
+                System.out.println("Usuário PADRAO criado com sucesso: user@user.com / 123456789");
+            }else{
+                System.out.println("Usuário PADRAO já existe no banco!");
+            }
         };
     }
     
