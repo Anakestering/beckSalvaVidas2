@@ -19,6 +19,6 @@ public class PostoDTO {
   
     private String descricao;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private boolean ativo;
+   
+    private Boolean ativo;
 }

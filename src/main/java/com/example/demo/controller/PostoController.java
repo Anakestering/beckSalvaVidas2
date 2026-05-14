@@ -15,22 +15,38 @@ import com.example.demo.service.PostoService;
 
 @RestController
 @RequestMapping("/postos")
+//está dizendo que esse controller trabalha com dados do tipo PostoDTO.
 public class PostoController extends BaseController<PostoDTO> {
 
     private final PostoService postoService;
-
+ //conecta service com controller.
     public PostoController(PostoService service) {
         super((BaseService<?, PostoDTO>) service);
         this.postoService = service;
     }
 
     @GetMapping("/ordenados")
+    //esse método devolve uma lista de PostoDTO.
     public List<PostoDTO> listarOrdenados() {
+
+        //pede pro Service fazer o trabalho e devolve o resultado.
         return postoService.listarOrdenados();
     }
 
     @PatchMapping("/{id}/ativo")
+    //@PathVariable Long id — está capturando esse {id} da URL e guardando na variável id.
     public PostoDTO alternarAtivo(@PathVariable Long id) {
         return postoService.alternarAtivo(id);
     }
 }
+/*FRONT-END chama /postos/ordenados
+      ↓
+CONTROLLER recebe
+      ↓
+postoService.listarOrdenados() ← liga pro service
+      ↓
+SERVICE faz o trabalho e devolve a lista
+      ↓
+CONTROLLER pega e devolve pro front-end
+      ↓
+FRONT-END exibe */

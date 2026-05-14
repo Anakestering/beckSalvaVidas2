@@ -67,6 +67,7 @@ public abstract class BaseService<E extends BaseEntity, D> {
 
             return e;
         } catch (Exception ex) {
+            ex.printStackTrace(); 
             throw new RuntimeException("Erro ao converter de DTO para Entity");
         }
     }

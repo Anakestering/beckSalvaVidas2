@@ -31,3 +31,14 @@ public class PostoService extends BaseService<Posto, PostoDTO> {
         return toDto(postoRepository.save(posto));
     }
 }
+/*CONTROLLER chama alternarAtivo(5)
+      ↓
+SERVICE busca o posto de id 5 no banco
+      ↓
+SERVICE inverte o ativo (true → false)
+      ↓
+SERVICE salva no banco
+      ↓
+SERVICE converte pra DTO e devolve
+      ↓
+CONTROLLER devolve pro front-end*/
