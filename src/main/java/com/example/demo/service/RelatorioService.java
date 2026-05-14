@@ -59,6 +59,10 @@ public class RelatorioService {
 
         Relatorio salvo = relatorioRepository.save(relatorio);
 
+System.out.println("ATIVO RELATORIO: " + salvo.isAtivo());
+System.out.println("VISIVEL RELATORIO: " + salvo.isVisivelAdmin());
+
+
         return toResponse(salvo);
     }
 

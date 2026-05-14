@@ -23,9 +23,6 @@ public abstract class BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private boolean ativo = true;
-
     @Column(updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
@@ -36,4 +33,8 @@ public abstract class BaseEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    // BaseEntity.java — garantir default no columnDefinition
+    @Column(nullable = false, columnDefinition = "BIT DEFAULT 1")
+    private boolean ativo = true;
 }

@@ -18,7 +18,6 @@ public class PostoDTO {
     private String nome;
   
     private String descricao;
-
-   
+    
     private Boolean ativo;
 }
