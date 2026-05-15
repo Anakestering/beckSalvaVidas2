@@ -7,6 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.dto.UsuarioDTO;
 import com.example.demo.entity.Usuario;
+import com.example.demo.enums.NivelAcesso;
 import com.example.demo.repository.UsuarioRepository;
 
 @Service
@@ -22,14 +23,32 @@ public class UsuarioService extends BaseService<Usuario, UsuarioDTO> {
     }
 
     @Override
-    public UsuarioDTO create(UsuarioDTO dto) {
-        if (usuarioRepository.existsByEmail(dto.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado.");
-        }
+public UsuarioDTO create(UsuarioDTO dto) {
 
-        Usuario usuario = toEntity(dto);
-        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
-
-        return toDto(usuarioRepository.save(usuario));
+    if (usuarioRepository.existsByEmail(dto.getEmail())) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Email já cadastrado."
+        );
     }
+
+    if (usuarioRepository.existsByCpf(dto.getCpf())) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "CPF já cadastrado."
+        );
+    }
+
+    Usuario usuario = toEntity(dto);
+
+    usuario.setSenha(
+        passwordEncoder.encode(dto.getSenha())
+    );
+
+    usuario.setNivelAcesso(
+        NivelAcesso.valueOf(dto.getNivelAcesso())
+    );
+
+    return toDto(usuarioRepository.save(usuario));
+}
 }

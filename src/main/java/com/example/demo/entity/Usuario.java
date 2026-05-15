@@ -18,6 +18,12 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class Usuario extends BaseEntity {
 
+    @Column(nullable = false)
+    private String nome;
+
+    @Column(nullable = false, unique = true, length = 11)
+    private String cpf;
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 

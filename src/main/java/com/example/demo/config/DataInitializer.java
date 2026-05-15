@@ -24,9 +24,13 @@ public class DataInitializer {
             if(repository.count() <= 0){
                 Usuario usuario = new Usuario();
 
+                usuario.setNome("Administrador");
+                usuario.setCpf("11111111111");
                 usuario.setEmail("admin@admin.com");
                 usuario.setNivelAcesso(NivelAcesso.ADMIN);
                 usuario.setSenha(passwordEncoder.encode("123456789"));
+
+    
 
                 repository.save(usuario);
 
@@ -38,6 +42,8 @@ public class DataInitializer {
             if(repository.count() <= 0){
                 Usuario usuario = new Usuario();
 
+                usuario.setNome("usuarioPadrao");
+                usuario.setCpf("22222222222");
                 usuario.setEmail("user@user.com");
                 usuario.setNivelAcesso(NivelAcesso.PADRAO);
                 usuario.setSenha(passwordEncoder.encode("123456789"));

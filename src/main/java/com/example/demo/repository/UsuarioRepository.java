@@ -18,4 +18,6 @@ public interface UsuarioRepository extends BaseRepository<Usuario, Long> {
 
     boolean existsByEmail(String email);
 
+    boolean existsByCpf(String cpf);
+
 }
