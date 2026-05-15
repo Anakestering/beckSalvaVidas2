@@ -23,8 +23,9 @@ public class UsuarioDTO {
     private String cpf;
 
     @Email(message = "O email deve ser válido.")
-    @NotBlank(message = "O email deve ser preenchido.")
     private String email;
+
+    private String telefone;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;

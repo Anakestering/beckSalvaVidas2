@@ -1,6 +1,6 @@
 package com.example.demo.dto;
 
-import jakarta.validation.constraints.Email;
+import org.hibernate.validator.constraints.br.CPF;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,10 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthDTO {
-
-    @Email(message = "O email deve ser válido.")
-    @NotBlank(message = "O email deve ser preenchido.")
-    private String email;
+    
+    @NotBlank(message = "O cpf deve ser preenchido.")
+    private String cpf;
 
     @NotBlank(message = "A senha deve ser preenchido.")
     private String senha;

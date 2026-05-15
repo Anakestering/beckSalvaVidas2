@@ -12,11 +12,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
+import org.hibernate.annotations.SQLRestriction;
 import lombok.Data;
 
 @MappedSuperclass
 @Data
 @EntityListeners(AuditingEntityListener.class)
+@SQLRestriction("ativo = true")
 public abstract class BaseEntity {
 
     @Id
