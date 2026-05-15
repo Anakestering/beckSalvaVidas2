@@ -71,11 +71,11 @@ public class CheckService {
     }
 
     public List<CheckinResponseDTO> listarTodos() {
-    return checkinRepository.buscarOrdenadosPorPosto()
-            .stream()
-            .map(this::toResponseDto)
-            .toList();
-}
+        return checkinRepository.buscarOrdenadosPorPosto()
+                .stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
 
     @Transactional
     public void ocultarTodos() {
@@ -95,6 +95,11 @@ public class CheckService {
         checkinRepository.save(c);
     }
 
+    @Transactional
+    public void deletarTodos() {
+        checkinRepository.deleteAll();
+    }
+
     public List<CheckinResponseDTO> buscarHoje(Long postoId) {
         LocalDate hoje = LocalDate.now();
         LocalDateTime inicio = hoje.atStartOfDay();
@@ -107,7 +112,6 @@ public class CheckService {
                 .toList();
     }
 
-   
     private CheckinResponseDTO toResponseDto(Checkin checkin) {
         CheckinResponseDTO dto = new CheckinResponseDTO();
         dto.setId(checkin.getId());
@@ -115,12 +119,11 @@ public class CheckService {
         dto.setHorario(checkin.getDataHora());
 
         if (checkin.getFoto() != null) {
-        String nomeArquivo = Paths.get(checkin.getFoto().getCaminho()).getFileName().toString();
-        dto.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
-    }
+            String nomeArquivo = Paths.get(checkin.getFoto().getCaminho()).getFileName().toString();
+            dto.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
+        }
 
         return dto;
     }
-
 
 }

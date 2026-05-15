@@ -77,13 +77,13 @@ public class CheckoutService {
 
         CheckoutResponseDTO response = new CheckoutResponseDTO();
         response.setPosto(posto.getNome());
-        response.setId(salvo.getId()); 
+        response.setId(salvo.getId());
         response.setHorario(salvo.getDataHora());
 
-       if (salvo.getFoto() != null) {
-    String nomeArquivo = Paths.get(salvo.getFoto().getCaminho()).getFileName().toString();
-    response.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
-}
+        if (salvo.getFoto() != null) {
+            String nomeArquivo = Paths.get(salvo.getFoto().getCaminho()).getFileName().toString();
+            response.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
+        }
         return response;
     }
 
@@ -112,6 +112,11 @@ public class CheckoutService {
         checkoutRepository.save(c);
     }
 
+    @Transactional
+    public void deletarTodos() {
+        checkoutRepository.deleteAll();
+    }
+
     public List<CheckoutResponseDTO> buscarHoje(Long postoId) {
         LocalDate hoje = LocalDate.now();
         LocalDateTime inicio = hoje.atStartOfDay();
@@ -127,14 +132,14 @@ public class CheckoutService {
     private CheckoutResponseDTO toResponseDto(Checkout checkout) {
         CheckoutResponseDTO dto = new CheckoutResponseDTO();
 
-        dto.setId(checkout.getId()); 
+        dto.setId(checkout.getId());
         dto.setPosto(checkout.getPosto().getNome());
         dto.setHorario(checkout.getDataHora());
 
         if (checkout.getFoto() != null) {
-        String nomeArquivo = Paths.get(checkout.getFoto().getCaminho()).getFileName().toString();
-        dto.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
-    }
+            String nomeArquivo = Paths.get(checkout.getFoto().getCaminho()).getFileName().toString();
+            dto.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
+        }
 
         return dto;
     }

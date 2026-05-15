@@ -67,7 +67,6 @@ public class CheckController {
         return checkoutService.listarTodos();
     }
 
-
     @Admin
     @PatchMapping("/out/ocultar-todos")
     public void ocultarTodosCheckouts() {
@@ -80,9 +79,15 @@ public class CheckController {
         checkoutService.ocultar(id);
     }
 
+    @Admin
+    @DeleteMapping("/todos")
+    public void deletarTodosRegistros() {
+        checkService.deletarTodos();
+        checkoutService.deletarTodos();
+    }
+
     @GetMapping("/out/hoje/{postoId}")
     public List<CheckoutResponseDTO> buscarCheckoutsHoje(@PathVariable Long postoId) {
         return checkoutService.buscarHoje(postoId);
     }
 }
-
