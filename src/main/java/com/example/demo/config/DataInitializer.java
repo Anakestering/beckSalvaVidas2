@@ -14,7 +14,7 @@ public class DataInitializer {
 
     private final PasswordEncoder passwordEncoder;
 
-    public DataInitializer(PasswordEncoder passwordEncoder) {
+    public DataInitializer(PasswordEncoder passwordEncoder){
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -30,25 +30,24 @@ public class DataInitializer {
                 usuario.setNivelAcesso(NivelAcesso.ADMIN);
                 usuario.setSenha(passwordEncoder.encode("111111"));
 
+
                 repository.save(usuario);
-            
-                 // cria usuário padrão 
-    Usuario padrao = new Usuario();
-    padrao.setNome("UsuarioPadrao");
-    padrao.setCpf("22222222222");
-    padrao.setEmail("user@user.com");
-    padrao.setNivelAcesso(NivelAcesso.PADRAO);
-    padrao.setSenha(passwordEncoder.encode("222222"));
-    repository.save(padrao);
 
 
-                System.out.println("Usuário ADMIN criado com sucesso: 111.111.111-11 / 111111");
+                usuario.setNome("usuarioPadrao");
+                usuario.setCpf("22222222222");
+                usuario.setEmail("user@user.com");
+                usuario.setNivelAcesso(NivelAcesso.PADRAO);
+                usuario.setSenha(passwordEncoder.encode("222222"));
+
+                repository.save(usuario);
+
+                System.out.println("Usuário ADMIN e PADRAO criado com sucesso");
             }else{
                 System.out.println("Usuário ADMIN e PADRAO já existe no banco!");
             }
-
-            
         };
-}
+    }
+    
 
 }

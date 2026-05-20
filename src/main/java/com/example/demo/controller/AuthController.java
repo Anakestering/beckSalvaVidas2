@@ -23,39 +23,44 @@ import jakarta.validation.Valid;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+        @Autowired
+        private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+        @Autowired
+        private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+        @Autowired
+        private JwtUtil jwtUtil;
 
-    
+        @PostMapping("/login")
+        @Public
+        public ResponseEntity<?> login(@RequestBody @Valid AuthDTO dto) {
 
-    @PostMapping("/login")
-    @Public
-    public ResponseEntity<?> login(@RequestBody @Valid AuthDTO dto) {
-        String cpf = dto.getCpf().replaceAll("[^0-9]", "");
-        String senha = dto.getSenha(); // TEXTO PURO
+                String cpf = dto.getCpf().replaceAll("\\D", "");
+                String senha = dto.getSenha();
 
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByCpf(cpf);
+                Optional<Usuario> usuarioOpt = usuarioRepository.findByCpf(cpf);
 
-        if (usuarioOpt.isPresent() && passwordEncoder.matches(senha, usuarioOpt.get().getSenha())) {
-            String nivelAcesso = usuarioOpt.get().getNivelAcesso().toString();
+                if (usuarioOpt.isPresent()
+                                && passwordEncoder.matches(
+                                                senha,
+                                                usuarioOpt.get().getSenha())) {
 
-            String token = jwtUtil.generateToken(cpf, nivelAcesso);
+                        String nivelAcesso = usuarioOpt.get()
+                                        .getNivelAcesso()
+                                        .toString();
 
-            return ResponseEntity.ok(Map.of(
-                "token", token, 
-                "tipo", nivelAcesso, 
-                "nome", usuarioOpt.get().getNome()
-            ));
+                        String token = jwtUtil.generateToken(
+                                        cpf,
+                                        nivelAcesso);
+
+                        return ResponseEntity.ok(Map.of(
+                                        "token", token,
+                                        "tipo", nivelAcesso));
+                }
+
+                return ResponseEntity
+                                .status(401)
+                                .body("Credenciais Inválidas!");
         }
-
-        return ResponseEntity.status(401).body("Credenciais Inválidas!");
-    }
-
-
 }

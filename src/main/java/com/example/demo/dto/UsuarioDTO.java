@@ -23,7 +23,7 @@ public class UsuarioDTO {
     private String cpf;
 
     @Email(message = "O email deve ser válido.")
-    private String email;
+    private String email = null;
 
     private String telefone;
 

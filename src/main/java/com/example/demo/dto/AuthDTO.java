@@ -1,6 +1,5 @@
 package com.example.demo.dto;
 
-import org.hibernate.validator.constraints.br.CPF;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthDTO {
-    
+
+    @NotBlank(message = "O cpf deve ser válido.")
     @NotBlank(message = "O cpf deve ser preenchido.")
     private String cpf;
 

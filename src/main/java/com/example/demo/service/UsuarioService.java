@@ -1,7 +1,5 @@
 package com.example.demo.service;
 
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,80 +25,40 @@ public class UsuarioService extends BaseService<Usuario, UsuarioDTO> {
     @Override
     public UsuarioDTO create(UsuarioDTO dto) {
 
-        String email = normalizar(dto.getEmail());
-        String cpf   = dto.getCpf().replaceAll("[^0-9]", "");
+        if (dto.getEmail() != null
+                && !dto.getEmail().isBlank()
+                && usuarioRepository.existsByEmail(dto.getEmail())) {
 
-        // verifica se existe um usuário INATIVO com esse CPF
-        // se sim, reativa e atualiza os dados em vez de criar duplicata
-        Optional<Usuario> inativo = usuarioRepository.findByCpfIncludingInactive(cpf);
-        if (inativo.isPresent()) {
-            Usuario usuario = inativo.get();
-
-            // valida email só se informado e diferente do atual
-            if (email != null && !email.equals(usuario.getEmail())) {
-                if (usuarioRepository.existsByEmail(email)) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado.");
-                }
-            }
-
-            usuario.setNome(dto.getNome());
-            usuario.setCpf(cpf);
-            usuario.setEmail(email);
-            usuario.setTelefone(normalizar(dto.getTelefone()));
-            usuario.setNivelAcesso(NivelAcesso.valueOf(dto.getNivelAcesso()));
-            usuario.setAtivo(true);
-            usuario.setDeletedAt(null);
-
-            // reseta a senha para os 6 primeiros dígitos do CPF
-            usuario.setSenha(passwordEncoder.encode(cpf.substring(0, 6)));
-
-            return toDto(usuarioRepository.save(usuario));
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Email já cadastrado.");
         }
 
-        // CPF novo — fluxo normal
-        if (email != null && usuarioRepository.existsByEmail(email)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado.");
-        }
-        if (usuarioRepository.existsByCpf(cpf)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CPF já cadastrado.");
+        
+        String cpfLimpo = dto.getCpf().replaceAll("\\D", "");
+
+        if (usuarioRepository.existsByCpf(cpfLimpo)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "CPF já cadastrado.");
         }
 
         Usuario usuario = toEntity(dto);
-        usuario.setCpf(cpf);
-        usuario.setEmail(email);
-        usuario.setTelefone(normalizar(dto.getTelefone()));
-        usuario.setSenha(passwordEncoder.encode(cpf.substring(0, 6)));
-        usuario.setNivelAcesso(NivelAcesso.valueOf(dto.getNivelAcesso()));
+
+        
+        usuario.setCpf(cpfLimpo);
+
+        // senha = 6 primeiros dígitos do CPF
+        String senhaPadrao = cpfLimpo.substring(0, 6);
+
+        usuario.setSenha(
+                passwordEncoder.encode(senhaPadrao));
+
+        usuario.setNivelAcesso(
+                NivelAcesso.valueOf(dto.getNivelAcesso()));
+
+        usuario.setAtivo(true);
 
         return toDto(usuarioRepository.save(usuario));
-    }
-
-    @Override
-    public UsuarioDTO update(Long id, UsuarioDTO dto) {
-        Usuario usuario = usuarioRepository.findById(id).orElseThrow();
-
-        String email = normalizar(dto.getEmail());
-
-        if (email != null && !email.equals(usuario.getEmail())) {
-            if (usuarioRepository.existsByEmail(email)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado.");
-            }
-        }
-
-        usuario.setNome(dto.getNome());
-        usuario.setCpf(dto.getCpf().replaceAll("[^0-9]", ""));
-        usuario.setEmail(email);
-        usuario.setTelefone(normalizar(dto.getTelefone()));
-        usuario.setNivelAcesso(NivelAcesso.valueOf(dto.getNivelAcesso()));
-
-        return toDto(usuarioRepository.save(usuario));
-    }
-
-    /**
-     * Retorna null se a string for null ou vazia.
-     * Evita inserir strings vazias em colunas com constraint UNIQUE.
-     */
-    private String normalizar(String valor) {
-        return (valor == null || valor.isBlank()) ? null : valor.trim();
     }
 }

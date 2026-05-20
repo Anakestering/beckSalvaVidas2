@@ -24,7 +24,7 @@ public class Usuario extends BaseEntity {
     @Column(nullable = false, unique = true, length = 11)
     private String cpf;
 
-    @Column(name = "email",  unique = true)
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "telefone")
