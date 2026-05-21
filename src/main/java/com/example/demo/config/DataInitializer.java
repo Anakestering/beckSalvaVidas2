@@ -34,13 +34,13 @@ public class DataInitializer {
                 repository.save(usuario);
 
 
-                usuario.setNome("usuarioPadrao");
+                /*usuario.setNome("usuarioPadrao");
                 usuario.setCpf("22222222222");
                 usuario.setEmail("user@user.com");
                 usuario.setNivelAcesso(NivelAcesso.PADRAO);
                 usuario.setSenha(passwordEncoder.encode("222222"));
 
-                repository.save(usuario);
+                repository.save(usuario);*/
 
                 System.out.println("Usuário ADMIN e PADRAO criado com sucesso");
             }else{

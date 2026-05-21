@@ -22,8 +22,10 @@ public class UsuarioDTO {
     @NotBlank(message = "O CPF deve ser preenchido.")
     private String cpf;
 
-    @Email(message = "O email deve ser válido.")
-    private String email = null;
+    private String email;
+    public void setEmail(String email) {
+        this.email = (email == null || email.isBlank()) ? null : email.trim();
+    }
 
     private String telefone;
 
