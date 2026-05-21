@@ -41,7 +41,7 @@ public abstract class BaseController<D> {
         return service.update(id, dto);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id){
         service.softDelete(id);
     }

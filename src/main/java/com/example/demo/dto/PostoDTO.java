@@ -19,5 +19,5 @@ public class PostoDTO {
   
     private String descricao;
     
-    private Boolean ativo;
+    private Boolean ativo = true;
 }

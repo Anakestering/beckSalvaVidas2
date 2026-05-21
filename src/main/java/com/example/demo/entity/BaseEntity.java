@@ -18,7 +18,6 @@ import lombok.Data;
 @MappedSuperclass
 @Data
 @EntityListeners(AuditingEntityListener.class)
-@SQLRestriction("ativo = true")
 public abstract class BaseEntity {
 
     @Id
@@ -37,6 +36,6 @@ public abstract class BaseEntity {
     private LocalDateTime deletedAt;
 
     // BaseEntity.java — garantir default no columnDefinition
-    @Column(nullable = false, columnDefinition = "BIT DEFAULT 1")
+    @Column(nullable = false)
     private boolean ativo = true;
 }

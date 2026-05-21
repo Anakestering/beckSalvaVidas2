@@ -26,6 +26,7 @@ import jakarta.transaction.Transactional;
 
 //diz que é um teste Spring e sobe toda a aplicação para testar
 @SpringBootTest
+@Transactional
 @ActiveProfiles("test")
 public class PostoControllerTest {
     // (aq fica as criações "universais" pra ser usado por todas as funções se
@@ -48,11 +49,14 @@ public class PostoControllerTest {
     @Autowired
     private PostoRepository postoRepository;
 
+    private Posto posto;
+
     // "Antes de cada" Executa este método antes de cada teste
     @BeforeEach
     public void setup() {
         // Cria o MockMvc usando o contexto da aplicação
         // O build():finaliza a construção do objeto.
+
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
         // Inicializa o conversor de objetos para JSON
         this.objectMapper = new ObjectMapper();
@@ -60,6 +64,12 @@ public class PostoControllerTest {
         // Gera o token de admin para todos os testes
         this.token = jwt.generateToken(
                 "teste@teste.com", NivelAcesso.ADMIN.toString());
+
+        this.posto = new Posto();
+        posto.setNome("Posto para DELETAR por id");
+        posto.setDescricao("Posto buscavel");
+
+        this.posto = postoRepository.save(posto);
 
     }
 
@@ -136,20 +146,16 @@ public class PostoControllerTest {
     @Test
     @DisplayName("Deve deletar posto pelo id")
     void deletarPosto() throws Exception {
-        Posto posto = new Posto();
-        posto.setNome("Posto para DELETAR por id");
-        posto.setDescricao("Posto buscavel");
 
-        posto = postoRepository.save(posto);
+        Long id = posto.getId();
 
-        mockMvc.perform(delete("/postos/" + posto.getId())
+        mockMvc.perform(delete("/postos/" + id)
                 .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
-        posto = postoRepository.findById(posto.getId()).orElseThrow();
+        posto = postoRepository.findById(id).orElseThrow();
 
         assertFalse(posto.isAtivo());
-
     }
 
 }

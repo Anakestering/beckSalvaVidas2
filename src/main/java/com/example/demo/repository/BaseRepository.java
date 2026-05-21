@@ -1,6 +1,7 @@
 package com.example.demo.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,7 +14,7 @@ import jakarta.transaction.Transactional;
 public interface BaseRepository<E, ID> extends JpaRepository<E, ID> {
 
     @Transactional
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("""
             UPDATE #{#entityName} e
             SET e.ativo = FALSE,
@@ -23,8 +24,13 @@ public interface BaseRepository<E, ID> extends JpaRepository<E, ID> {
     void softDeleteById(ID id);
 
     @Query("""
-        SELECT e FROM #{#entityName} e 
-        WHERE e.ativo = TRUE
-    """)
+                SELECT e FROM #{#entityName} e
+                WHERE e.ativo = TRUE
+            """)
+    @Override
     List<E> findAll();
+
+    @Override
+    @Query("SELECT e FROM #{#entityName} e WHERE e.id = :id")
+    Optional<E> findById(ID id);
 }
