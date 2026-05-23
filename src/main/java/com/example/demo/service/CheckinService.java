@@ -4,7 +4,6 @@ package com.example.demo.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,7 @@ import com.example.demo.repository.PostoRepository;
 import jakarta.transaction.Transactional;
 
 @Service
-public class CheckService {
+public class CheckinService {
 
     @Autowired
     private PostoRepository postoRepository;
@@ -62,10 +61,7 @@ public class CheckService {
         crd.setPosto(posto.getNome());
         crd.setId(checkinSalvo.getId());
         crd.setHorario(checkinSalvo.getCreatedAt());
-        if (checkinSalvo.getFoto() != null) {
-            String nomeArquivo = Paths.get(checkinSalvo.getFoto().getCaminho()).getFileName().toString();
-            crd.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
-        }
+        crd.setFoto(arquivoService.montarUrl(checkinSalvo.getFoto()));
 
         return crd;
     }
@@ -117,11 +113,7 @@ public class CheckService {
         dto.setId(checkin.getId());
         dto.setPosto(checkin.getPosto().getNome());
         dto.setHorario(checkin.getDataHora());
-
-        if (checkin.getFoto() != null) {
-            String nomeArquivo = Paths.get(checkin.getFoto().getCaminho()).getFileName().toString();
-            dto.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
-        }
+        dto.setFoto(arquivoService.montarUrl(checkin.getFoto()));
 
         return dto;
     }

@@ -22,80 +22,81 @@ public class UsuarioService extends BaseService<Usuario, UsuarioDTO> {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Override
-public UsuarioDTO create(UsuarioDTO dto) {
-    String cpfLimpo = dto.getCpf().replaceAll("\\D", "");
-
-    // normaliza ANTES de toEntity
-    dto.setEmail(dto.getEmail() != null && dto.getEmail().isBlank() ? null : dto.getEmail());
-    dto.setTelefone(dto.getTelefone() != null && dto.getTelefone().isBlank() ? null : dto.getTelefone());
-
-    if (dto.getEmail() != null && usuarioRepository.existsByEmail(dto.getEmail())) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado.");
+    private String normalizarCampoOpcional(String valor) {
+        return valor != null && valor.isBlank() ? null : valor;
     }
-    if (usuarioRepository.existsByCpf(cpfLimpo)) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CPF já cadastrado.");
-    }
-
-    Usuario usuario = toEntity(dto); // agora dto.email já é null se estava vazio
-
-    usuario.setCpf(cpfLimpo);
-    usuario.setSenha(passwordEncoder.encode(cpfLimpo.substring(0, 6)));
-    usuario.setNivelAcesso(NivelAcesso.valueOf(dto.getNivelAcesso()));
-    usuario.setAtivo(true);
-
-    return toDto(usuarioRepository.save(usuario));
-}
-
 
     @Override
-public UsuarioDTO update(Long id, UsuarioDTO dto) {
+    public UsuarioDTO create(UsuarioDTO dto) {
+        String cpfLimpo = dto.getCpf().replaceAll("\\D", "");
 
-    Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Usuário não encontrado."));
+        dto.setEmail(normalizarCampoOpcional(dto.getEmail()));
+        dto.setTelefone(normalizarCampoOpcional(dto.getTelefone()));
 
-    String cpfLimpo = dto.getCpf().replaceAll("\\D", "");
+        if (dto.getEmail() != null && usuarioRepository.existsByEmail(dto.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado.");
+        }
+        if (usuarioRepository.existsByCpf(cpfLimpo)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CPF já cadastrado.");
+        }
 
-    // email opcional
-    String email = dto.getEmail();
-    if (email != null && email.isBlank()) {
-        email = null;
+        Usuario usuario = toEntity(dto);
+        usuario.setCpf(cpfLimpo);
+        usuario.setSenha(passwordEncoder.encode(cpfLimpo.substring(0, 6)));
+        usuario.setNivelAcesso(NivelAcesso.valueOf(dto.getNivelAcesso()));
+        usuario.setAtivo(true);
+
+        return toDto(usuarioRepository.save(usuario));
+
     }
 
-    // telefone opcional
-    String telefone = dto.getTelefone();
-    if (telefone != null && telefone.isBlank()) {
-        telefone = null;
+    @Override
+    public UsuarioDTO update(Long id, UsuarioDTO dto) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Usuário não encontrado."));
+
+        String cpfLimpo = dto.getCpf().replaceAll("\\D", "");
+        String email = normalizarCampoOpcional(dto.getEmail());
+        String telefone = normalizarCampoOpcional(dto.getTelefone());
+
+        // verifica CPF duplicado (exceto o próprio usuário)
+        if (!usuario.getCpf().equals(cpfLimpo)
+                && usuarioRepository.existsByCpf(cpfLimpo)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "CPF já cadastrado.");
+        }
+
+        // verifica email duplicado (exceto o próprio usuário)
+        if (email != null
+                && !email.equals(usuario.getEmail())
+                && usuarioRepository.existsByEmail(email)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Email já cadastrado.");
+        }
+
+        usuario.setNome(dto.getNome());
+        usuario.setCpf(cpfLimpo);
+        usuario.setEmail(email);
+        usuario.setTelefone(telefone);
+        usuario.setNivelAcesso(
+                NivelAcesso.valueOf(dto.getNivelAcesso()));
+
+        return toDto(usuarioRepository.save(usuario));
     }
 
-    // verifica CPF duplicado (exceto o próprio usuário)
-    if (!usuario.getCpf().equals(cpfLimpo)
-            && usuarioRepository.existsByCpf(cpfLimpo)) {
+    @Override
+    public UsuarioDTO toDto(Usuario entity) {
+        UsuarioDTO dto = super.toDto(entity);
+        dto.setNivelAcesso(entity.getNivelAcesso() != null ? entity.getNivelAcesso().name() : null);
 
-        throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "CPF já cadastrado.");
+        return dto;
     }
 
-    // verifica email duplicado (exceto o próprio usuário)
-    if (email != null
-            && !email.equals(usuario.getEmail())
-            && usuarioRepository.existsByEmail(email)) {
-
-        throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Email já cadastrado.");
-    }
-
-    usuario.setNome(dto.getNome());
-    usuario.setCpf(cpfLimpo);
-    usuario.setEmail(email);
-    usuario.setTelefone(telefone);
-    usuario.setNivelAcesso(
-            NivelAcesso.valueOf(dto.getNivelAcesso()));
-
-    return toDto(usuarioRepository.save(usuario));
-}
 }

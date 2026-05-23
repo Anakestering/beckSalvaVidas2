@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -48,7 +49,6 @@ public class PostoControllerTest {
 
     @Autowired
     private PostoRepository postoRepository;
-
     private Posto posto;
 
     // "Antes de cada" Executa este método antes de cada teste
@@ -156,6 +156,51 @@ public class PostoControllerTest {
         posto = postoRepository.findById(id).orElseThrow();
 
         assertFalse(posto.isAtivo());
+    }
+
+    // ========== rotas criadas por mim ============
+
+    @Test
+    @DisplayName("Alternar de ativo pra inativo")
+    void alternarAtivo() throws Exception {
+
+        Long id = posto.getId();
+
+        mockMvc.perform(patch("/postos/" + posto.getId() + "/ativo")
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        posto = postoRepository.findById(id).orElseThrow();
+
+        assertEquals(false, posto.isAtivo());
+    }
+
+    @Test
+    @DisplayName("Alternar de inativo para ativo")
+    void alternarInativo() throws Exception {
+
+        // desativa o posto primeiro pra depois poder ativar
+        posto.setAtivo(false);
+        posto = postoRepository.save(posto);
+
+        Long id = posto.getId();
+
+        mockMvc.perform(patch("/postos/" + posto.getId() + "/ativo")
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        posto = postoRepository.findById(id).orElseThrow();
+
+        assertEquals(true, posto.isAtivo());
+    }
+
+    @Test
+    @DisplayName("Teste rota ordenados")
+    void rotaOrdenados() throws Exception {
+        mockMvc.perform(get("/postos/ordenados")
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
     }
 
 }

@@ -11,7 +11,7 @@ import com.example.demo.dto.CheckinDTO;
 import com.example.demo.dto.CheckinResponseDTO;
 import com.example.demo.dto.CheckoutDTO;
 import com.example.demo.dto.CheckoutResponseDTO;
-import com.example.demo.service.CheckService;
+import com.example.demo.service.CheckinService;
 import com.example.demo.service.CheckoutService;
 
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ import jakarta.validation.Valid;
 public class CheckController {
 
     @Autowired
-    private CheckService checkService;
+    private CheckinService checkService;
 
     @Autowired
     private CheckoutService checkoutService;
@@ -79,15 +79,19 @@ public class CheckController {
         checkoutService.ocultar(id);
     }
 
+    @GetMapping("/out/hoje/{postoId}")
+    public List<CheckoutResponseDTO> buscarCheckoutsHoje(@PathVariable Long postoId) {
+        return checkoutService.buscarHoje(postoId);
+    }
+
+
+
+    //========= checkin/checkou ========
+
     @Admin
     @DeleteMapping("/todos")
     public void deletarTodosRegistros() {
         checkService.deletarTodos();
         checkoutService.deletarTodos();
-    }
-
-    @GetMapping("/out/hoje/{postoId}")
-    public List<CheckoutResponseDTO> buscarCheckoutsHoje(@PathVariable Long postoId) {
-        return checkoutService.buscarHoje(postoId);
     }
 }

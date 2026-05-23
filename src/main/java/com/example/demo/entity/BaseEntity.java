@@ -12,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-import org.hibernate.annotations.SQLRestriction;
 import lombok.Data;
 
 @MappedSuperclass
@@ -35,7 +34,6 @@ public abstract class BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    // BaseEntity.java — garantir default no columnDefinition
     @Column(nullable = false)
     private boolean ativo = true;
 }

@@ -3,7 +3,6 @@ package com.example.demo.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,11 +78,7 @@ public class CheckoutService {
         response.setPosto(posto.getNome());
         response.setId(salvo.getId());
         response.setHorario(salvo.getDataHora());
-
-        if (salvo.getFoto() != null) {
-            String nomeArquivo = Paths.get(salvo.getFoto().getCaminho()).getFileName().toString();
-            response.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
-        }
+        response.setFoto(arquivoService.montarUrl(salvo.getFoto()));
         return response;
     }
 
@@ -135,11 +130,7 @@ public class CheckoutService {
         dto.setId(checkout.getId());
         dto.setPosto(checkout.getPosto().getNome());
         dto.setHorario(checkout.getDataHora());
-
-        if (checkout.getFoto() != null) {
-            String nomeArquivo = Paths.get(checkout.getFoto().getCaminho()).getFileName().toString();
-            dto.setFoto("http://localhost:8080/arquivos/" + nomeArquivo);
-        }
+        dto.setFoto(arquivoService.montarUrl(checkout.getFoto()));
 
         return dto;
     }

@@ -59,29 +59,11 @@ public class RelatorioService {
 
         Relatorio salvo = relatorioRepository.save(relatorio);
 
-System.out.println("ATIVO RELATORIO: " + salvo.isAtivo());
-System.out.println("VISIVEL RELATORIO: " + salvo.isVisivelAdmin());
-
-
-        return toResponse(salvo);
+        return toDto(salvo);
     }
 
     public boolean existeHoje(Long postoId) {
         return relatorioRepository.existsByPostoIdAndData(postoId, LocalDate.now());
-    }
-
-    private RelatorioResponseDTO toResponse(Relatorio r) {
-        RelatorioResponseDTO dto = new RelatorioResponseDTO();
-        dto.setId(r.getId());
-        dto.setPostoId(r.getPosto().getId());
-        dto.setPosto(r.getPosto().getNome());
-        dto.setData(r.getData());
-        dto.setAtaquesManha(r.getAtaquesManha());
-        dto.setPrevencoesManha(r.getPrevencoesManha());
-        dto.setAtaquesTarde(r.getAtaquesTarde());
-        dto.setPrevencoesTarde(r.getPrevencoesTarde());
-        dto.setObservacoes(r.getObservacoes());
-        return dto;
     }
 
     public List<RelatorioResponseDTO> listarTodos() {

@@ -13,11 +13,13 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.demo.entity.Arquivo;
 import com.example.demo.repository.ArquivoRepository;
 
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 @Service
@@ -39,9 +41,9 @@ public class ArquivoService {
             }
 
             String nomeOriginal = file.getOriginalFilename();
-            String extensao = "";
+
             if (nomeOriginal != null && nomeOriginal.contains(".")) {
-                extensao = nomeOriginal.substring(nomeOriginal.lastIndexOf("."));
+                nomeOriginal.substring(nomeOriginal.lastIndexOf("."));
             }
 
             String nome = UUID.randomUUID().toString();
@@ -69,7 +71,7 @@ public class ArquivoService {
             Resource resource = new UrlResource(arquivo.toUri());
 
             if (!resource.exists() || !resource.isReadable()) {
-                throw new RuntimeException("Arquivo não encontrado: " + nome);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Arquivo não encontrado: " + nome);
             }
 
             String contentType = Files.probeContentType(arquivo);
@@ -84,6 +86,14 @@ public class ArquivoService {
         } catch (IOException e) {
             throw new RuntimeException("Erro ao ler arquivo", e);
         }
+
+    }
+
+    public String montarUrl(Arquivo foto) {
+        if (foto == null)
+            return null;
+        String nome = Paths.get(foto.getCaminho()).getFileName().toString();
+        return "http://localhost:8080/arquivos/" + nome;
     }
 
 }
