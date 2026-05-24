@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -17,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.example.demo.dto.PostoStatusDTO;
+import com.example.demo.dto.ResumoResponseDTO;
 import com.example.demo.entity.Checkin;
 import com.example.demo.entity.Posto;
 import com.example.demo.repository.CheckinRepository;
@@ -100,6 +103,21 @@ public class PostoServiceTest {
 
         assertEquals(1, status.getCheckins());
         assertFalse(status.isAtrasado());
+
+    }
+
+    @Test
+    @DisplayName("testando resumo-hoje")
+    void resumoHoje() {
+
+        //chama o metodo no service
+        ResumoResponseDTO resultado = postoService.resumoPosto(posto.getId());
+
+        //confere se existem
+        assertNotNull(resultado);
+        assertNotNull(resultado.getCheckins());
+        assertNotNull(resultado.getCheckouts());
+        assertNull(resultado.getRelatorio());
 
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.PostoDTO;
 import com.example.demo.dto.PostoStatusDTO;
+import com.example.demo.dto.ResumoResponseDTO;
 import com.example.demo.service.BaseService;
 import com.example.demo.service.PostoService;
 
@@ -44,6 +45,11 @@ public class PostoController extends BaseController<PostoDTO> {
       // variável id.
       public PostoDTO alternarAtivo(@PathVariable Long id) {
             return postoService.alternarAtivo(id);
+      }
+
+      @GetMapping("/{id}/resumo-hoje")
+      public ResumoResponseDTO resumoHoje(@PathVariable Long id) {
+            return postoService.resumoPosto(id);
       }
 }
 /*

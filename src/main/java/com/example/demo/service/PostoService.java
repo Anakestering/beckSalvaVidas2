@@ -8,8 +8,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.CheckinResponseDTO;
+import com.example.demo.dto.CheckoutResponseDTO;
 import com.example.demo.dto.PostoDTO;
 import com.example.demo.dto.PostoStatusDTO;
+import com.example.demo.dto.RelatorioResponseDTO;
+import com.example.demo.dto.ResumoResponseDTO;
 import com.example.demo.entity.Checkin;
 import com.example.demo.entity.Checkout;
 import com.example.demo.entity.Posto;
@@ -30,7 +34,17 @@ public class PostoService extends BaseService<Posto, PostoDTO> {
     @Autowired
     private CheckinRepository checkinRepository;
     @Autowired
+    private CheckinService checkinService;
+
+    @Autowired
     private CheckoutRepository checkoutRepository;
+    @Autowired
+    private CheckoutService checkoutService;
+
+    @Autowired
+    private RelatorioService relatorioService;
+
+
 
     public List<PostoStatusDTO> buscarStatusPostos() {
         LocalDate hoje = LocalDate.now();
@@ -95,17 +109,26 @@ public class PostoService extends BaseService<Posto, PostoDTO> {
         posto.setAtivo(!posto.isAtivo());
         return toDto(postoRepository.save(posto));
     }
+
+    public ResumoResponseDTO resumoPosto(Long id) {
+
+        Posto posto = postoRepository.findById(id).orElseThrow();
+
+        List<CheckinResponseDTO> checkins = checkinService
+                .buscarHoje(id); // já existe e já retorna DTO!
+
+        List<CheckoutResponseDTO> checkouts = checkoutService
+                .buscarHoje(id); // já existe também!
+
+        RelatorioResponseDTO relatorio = relatorioService
+                .buscarHoje(id); // já existe também!
+
+        ResumoResponseDTO dto = new ResumoResponseDTO();
+        dto.setCheckins(checkins);
+        dto.setCheckouts(checkouts);
+        dto.setRelatorio(relatorio);
+        dto.setPosto(toDto(posto));
+
+        return dto;
+    }
 }
-/*
- * CONTROLLER chama alternarAtivo(5)
- * ↓
- * SERVICE busca o posto de id 5 no banco
- * ↓
- * SERVICE inverte o ativo (true → false)
- * ↓
- * SERVICE salva no banco
- * ↓
- * SERVICE converte pra DTO e devolve
- * ↓
- * CONTROLLER devolve pro front-end
- */
