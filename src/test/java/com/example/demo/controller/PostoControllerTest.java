@@ -51,6 +51,7 @@ public class PostoControllerTest {
     private PostoRepository postoRepository;
     private Posto posto;
 
+
     // "Antes de cada" Executa este método antes de cada teste
     @BeforeEach
     public void setup() {

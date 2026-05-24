@@ -9,15 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostoDTO {
+public class PostoStatusDTO {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Long id;
+    private Long postoId;
 
-    @NotBlank(message = "O nome deve ser preenchido.")
-    private String nome;
+    private int checkins;
   
-    private String descricao;
+    private int checkouts;
     
-    private Boolean ativo;
+    private boolean atrasado;
 }

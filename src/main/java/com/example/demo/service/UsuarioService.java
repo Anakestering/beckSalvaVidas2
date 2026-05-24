@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,13 +35,30 @@ public class UsuarioService extends BaseService<Usuario, UsuarioDTO> {
         dto.setEmail(normalizarCampoOpcional(dto.getEmail()));
         dto.setTelefone(normalizarCampoOpcional(dto.getTelefone()));
 
+        // verifica se existe inativo com esse CPF → reativa
+        Optional<Usuario> inativo = usuarioRepository.findByCpfAndAtivoFalse(cpfLimpo);
+        if (inativo.isPresent()) {
+            Usuario usuario = inativo.get();
+            usuario.setNome(dto.getNome());
+            usuario.setEmail(dto.getEmail());
+            usuario.setTelefone(dto.getTelefone());
+            usuario.setSenha(passwordEncoder.encode(cpfLimpo.substring(0, 6)));
+            usuario.setNivelAcesso(NivelAcesso.valueOf(dto.getNivelAcesso()));
+            usuario.setAtivo(true);
+            return toDto(usuarioRepository.save(usuario));
+        }
+
+        // verifica email duplicado
         if (dto.getEmail() != null && usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado.");
         }
+
+        // verifica se existe ativo com esse CPF → barra
         if (usuarioRepository.existsByCpf(cpfLimpo)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CPF já cadastrado.");
         }
 
+        // cria novo
         Usuario usuario = toEntity(dto);
         usuario.setCpf(cpfLimpo);
         usuario.setSenha(passwordEncoder.encode(cpfLimpo.substring(0, 6)));
@@ -47,7 +66,6 @@ public class UsuarioService extends BaseService<Usuario, UsuarioDTO> {
         usuario.setAtivo(true);
 
         return toDto(usuarioRepository.save(usuario));
-
     }
 
     @Override

@@ -25,4 +25,6 @@ public interface UsuarioRepository extends BaseRepository<Usuario, Long> {
     //para o initializer
     List<Usuario> findByNivelAcesso(NivelAcesso nivelAcesso);
 
+    Optional<Usuario> findByCpfAndAtivoFalse(String cpf);
+
 }

@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.http.MediaType;
@@ -164,14 +165,13 @@ public class UsuarioControllerTest {
                 .andExpect(jsonPath("$.id").doesNotExist());
     }
 
-
     @Test
     @DisplayName("Deve tentar criar um usuário com campo obrigatório faltando.")
     void criarUsuarioErrado() throws Exception {
 
         UsuarioDTO usuarioDTO = new UsuarioDTO();
 
-        //só pra testar simular 100%
+        // só pra testar simular 100%
         usuarioDTO.setNome("teste2");
         usuarioDTO.setCpf("");
         usuarioDTO.setEmail("testeUser@gmail.com");
@@ -187,7 +187,6 @@ public class UsuarioControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.id").doesNotExist());
     }
-
 
     @Test
     @DisplayName("testando a edição")
@@ -224,7 +223,8 @@ public class UsuarioControllerTest {
     @DisplayName("Deve deletar usuario")
     void deletarUsuario() throws Exception {
 
-        // pra n precisar fazer "usuario.getId()" onde iria o id dele, poderia por no setup
+        // pra n precisar fazer "usuario.getId()" onde iria o id dele, poderia por no
+        // setup
         Long id = usuario.getId();
 
         mockMvc.perform(delete("/usuarios/" + id)
@@ -236,4 +236,120 @@ public class UsuarioControllerTest {
         assertFalse(usuario.isAtivo());
     }
 
+    /*
+     * Reativar usuário inativo —
+     * salva usuário com ativo = false pelo repository, faz POST /usuarios com mesmo
+     * CPF, verifica que voltou ativo
+     * CPF duplicado no update —
+     * cria dois usuários, tenta editar um com o CPF do outro, espera 400
+     * Email duplicado no update —
+     * igual ao CPF mas com email
+     */
+
+    @Test
+    @DisplayName("Reativar usuário inativo")
+    void reativarUsuarioInativo() throws Exception {
+        this.usuario = new Usuario();
+        usuario.setNome("testeAtivo");
+        usuario.setCpf("11122233344");
+        usuario.setEmail("tantofaz2@gmail.com");
+        usuario.setSenha("123456");
+        usuario.setNivelAcesso(NivelAcesso.PADRAO);
+        usuario.setAtivo(false);
+        this.usuario = usuarioRepository.save(usuario);
+
+        UsuarioDTO usuarioDTO = new UsuarioDTO();
+
+        usuarioDTO.setNome("testeAtivo");
+        usuarioDTO.setCpf("11122233344");
+        usuarioDTO.setEmail("");
+        usuarioDTO.setTelefone("");
+        usuarioDTO.setNivelAcesso("PADRAO");
+
+        String json = objectMapper.writeValueAsString(usuarioDTO);
+
+        mockMvc.perform(post("/usuarios")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cpf").value("11122233344"));
+
+        Usuario reativado = usuarioRepository.findById(usuario.getId()).orElseThrow();
+        assertTrue(reativado.isAtivo());
+    }
+
+    /*
+     * CPF duplicado no update —
+     * cria dois usuários, tenta editar um com o CPF do outro, espera 400
+     * Email duplicado no update —
+     * igual ao CPF mas com email
+     */
+    
+
+    @Test
+    @DisplayName("tentando editar um usuario com cpf ja existente e ativo")
+    void editarUsuarioComCpfAtivo() throws Exception {
+
+        Usuario usuarioB = new Usuario();
+
+        usuarioB.setNome("testeCpfDuplo");
+        usuarioB.setCpf("11122233344");
+        usuarioB.setEmail("tantofaz2@gmail.com");
+        usuarioB.setSenha("123456");
+        usuarioB.setNivelAcesso(NivelAcesso.PADRAO);
+        usuarioB.setAtivo(true);
+        usuarioB = usuarioRepository.save(usuarioB);
+
+        // requisicao de edicao usando o msm cpf do usuario setup
+
+        UsuarioDTO usuarioDTO = new UsuarioDTO();
+
+        usuarioDTO.setNome("testeCpfDuplo");
+        usuarioDTO.setCpf("12345678910");
+        usuarioDTO.setEmail("");
+        usuarioDTO.setTelefone("");
+        usuarioDTO.setNivelAcesso("PADRAO");
+
+        String json = objectMapper.writeValueAsString(usuarioDTO);
+
+        mockMvc.perform(put("/usuarios/" + usuarioB.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("tentando editar um usuario com email ja existente e ativo")
+    void editarUsuarioComEmailAtivo() throws Exception {
+
+        Usuario usuarioB = new Usuario();
+
+        usuarioB.setNome("testeCpfDuplo");
+        usuarioB.setCpf("11122233344");
+        usuarioB.setEmail("tantofaz2@gmail.com");
+        usuarioB.setSenha("123456");
+        usuarioB.setNivelAcesso(NivelAcesso.PADRAO);
+        usuarioB.setAtivo(true);
+        usuarioB = usuarioRepository.save(usuarioB);
+
+        // requisicao de edicao usando o msm email do usuario setup
+
+        UsuarioDTO usuarioDTO = new UsuarioDTO();
+
+        usuarioDTO.setNome("testeCpfDuplo");
+        usuarioDTO.setCpf("11122233344");
+        usuarioDTO.setEmail("tantofaz@gmail.com");
+        usuarioDTO.setTelefone("");
+        usuarioDTO.setNivelAcesso("PADRAO");
+
+        String json = objectMapper.writeValueAsString(usuarioDTO);
+
+        mockMvc.perform(put("/usuarios/" + usuarioB.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+    }
 }
