@@ -44,14 +44,12 @@ public class PostoService extends BaseService<Posto, PostoDTO> {
     @Autowired
     private RelatorioService relatorioService;
 
-
-
     public List<PostoStatusDTO> buscarStatusPostos() {
         LocalDate hoje = LocalDate.now();
         LocalDateTime inicio = hoje.atStartOfDay();
         LocalDateTime fim = hoje.atTime(23, 59, 59);
 
-        List<Posto> postos = postoRepository.findByDeletedAtIsNullOrderByAtivoDescNomeAsc()
+        List<Posto> postos = postoRepository.findAllNaturalOrder() 
                 .stream()
                 .filter(Posto::isAtivo)
                 .toList();
@@ -80,7 +78,7 @@ public class PostoService extends BaseService<Posto, PostoDTO> {
     }
 
     public List<PostoDTO> listarOrdenados() {
-        return postoRepository.findByDeletedAtIsNullOrderByAtivoDescNomeAsc()
+        return postoRepository.findAllNaturalOrder() 
                 .stream()
                 .map(this::toDto)
                 .toList();
@@ -97,7 +95,7 @@ public class PostoService extends BaseService<Posto, PostoDTO> {
     public Posto toEntity(PostoDTO dto) {
         try {
             Posto posto = new Posto();
-            BeanUtils.copyProperties(dto, posto, "ativo"); // ignora o campo ativo
+            BeanUtils.copyProperties(dto, posto, "ativo");
             return posto;
         } catch (Exception ex) {
             throw new RuntimeException("Erro ao converter PostoDTO para Posto");
@@ -111,17 +109,11 @@ public class PostoService extends BaseService<Posto, PostoDTO> {
     }
 
     public ResumoResponseDTO resumoPosto(Long id) {
-
         Posto posto = postoRepository.findById(id).orElseThrow();
 
-        List<CheckinResponseDTO> checkins = checkinService
-                .buscarHoje(id); // já existe e já retorna DTO!
-
-        List<CheckoutResponseDTO> checkouts = checkoutService
-                .buscarHoje(id); // já existe também!
-
-        RelatorioResponseDTO relatorio = relatorioService
-                .buscarHoje(id); // já existe também!
+        List<CheckinResponseDTO> checkins = checkinService.buscarHoje(id);
+        List<CheckoutResponseDTO> checkouts = checkoutService.buscarHoje(id);
+        RelatorioResponseDTO relatorio = relatorioService.buscarHoje(id);
 
         ResumoResponseDTO dto = new ResumoResponseDTO();
         dto.setCheckins(checkins);

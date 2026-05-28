@@ -35,7 +35,7 @@ public class UsuarioService extends BaseService<Usuario, UsuarioDTO> {
         dto.setEmail(normalizarCampoOpcional(dto.getEmail()));
         dto.setTelefone(normalizarCampoOpcional(dto.getTelefone()));
 
-        // verifica se existe inativo com esse CPF → reativa
+        // verifica se existe inativo com esse CPF e reativa
         Optional<Usuario> inativo = usuarioRepository.findByCpfAndAtivoFalse(cpfLimpo);
         if (inativo.isPresent()) {
             Usuario usuario = inativo.get();
@@ -53,7 +53,7 @@ public class UsuarioService extends BaseService<Usuario, UsuarioDTO> {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado.");
         }
 
-        // verifica se existe ativo com esse CPF → barra
+        // verifica se existe ativo com esse CPF e barra
         if (usuarioRepository.existsByCpf(cpfLimpo)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CPF já cadastrado.");
         }
@@ -80,7 +80,7 @@ public class UsuarioService extends BaseService<Usuario, UsuarioDTO> {
         String email = normalizarCampoOpcional(dto.getEmail());
         String telefone = normalizarCampoOpcional(dto.getTelefone());
 
-        // verifica CPF duplicado (exceto o próprio usuário)
+        // verifica CPF duplicado
         if (!usuario.getCpf().equals(cpfLimpo)
                 && usuarioRepository.existsByCpf(cpfLimpo)) {
 
@@ -89,7 +89,7 @@ public class UsuarioService extends BaseService<Usuario, UsuarioDTO> {
                     "CPF já cadastrado.");
         }
 
-        // verifica email duplicado (exceto o próprio usuário)
+        // verifica email duplicado
         if (email != null
                 && !email.equals(usuario.getEmail())
                 && usuarioRepository.existsByEmail(email)) {
